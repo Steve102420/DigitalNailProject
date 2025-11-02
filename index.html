@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body
+    {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 30px;
+      background-color: #121212;
+      color: #FFFFFF;
+    }
+
+    h2
+    {
+      color: #FFFFFF;
+    }
+
+    img
+    {
+      max-width: 90%;
+      height: auto;
+      margin-bottom: 20px;
+      border: 2px solid #444;
+      border-radius: 8px;
+    }
+
+    form
+    {
+      margin-top: 20px;
+    }
+
+    /* Upload gomb stílusa */
+    .upload-btn
+    {
+      position: relative;
+      padding: 10px 24px;
+      font-size: 16px;
+      background-color: #1E1E1E;
+      color: #FFFFFF;
+      border: 1px solid #444;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .upload-btn:hover
+    {
+      background-color: #333333;
+      border-color: #666666;
+    }
+
+    /* Tooltip stílus */
+    .upload-btn .tooltip
+    {
+      visibility: hidden;
+      width: 240px;
+      background-color: #222;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;           /* gomb fölött jelenjen meg */
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+      border: 1px solid #555;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .upload-btn .tooltip::after
+    {
+      content: "";
+      position: absolute;
+      top: 100%;               /* kis nyíl lefelé */
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #222 transparent transparent transparent;
+    }
+
+    .upload-btn:hover .tooltip
+    {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Rejtett fájl input */
+    input[type=file]
+    {
+      display: none;
+    }
+
+    footer
+    {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #AAAAAA;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="Logo.bmp" alt="No image yet">
+
+  <form id="uploadForm" method="POST" action="/upload" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="upload" accept=".bmp">
+    <button type="button" class="upload-btn" onclick="selectFile()">
+      Upload
+      <span class="tooltip">
+        Only <strong>.BMP</strong> files are supported.<br>
+        Recommended resolution: <strong>64x64 pixels</strong>.<br>
+        The upload starts automatically after selection.
+      </span>
+    </button>
+    <br><br>
+    Only 64x64 *.BMP files are supported.
+  </form>
+<br><br><br>
+  <form action="/sleep" method="GET">
+    <input type="submit" value="Wifi off" class="upload-btn">
+    <br><br>
+	  (Turn off the WiFi of your Anima Nails to save battery)
+    <br><br><br><br><br>
+  </form>
+
+  <footer>
+    Anima Nails - 2026
+  </footer>
+
+  <script>
+    function selectFile()
+    {
+      const fileInput = document.getElementById('fileInput');
+      fileInput.click();
+
+      fileInput.onchange = function()
+      {
+        if (fileInput.files.length > 0)
+        {
+          document.getElementById('uploadForm').submit();
+        }
+      };
+    }
+  </script>
+
+</body>
+</html>
