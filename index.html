@@ -1,7 +1,8 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WiFi setup</title>
   <style>
     body
     {
@@ -11,13 +12,11 @@
       background-color: #121212;
       color: #FFFFFF;
     }
-
     h2
     {
       color: #FFFFFF;
     }
-
-    img
+	img
     {
       max-width: 90%;
       height: auto;
@@ -25,129 +24,235 @@
       border: 2px solid #444;
       border-radius: 8px;
     }
-
-    form
-    {
-      margin-top: 20px;
-    }
-
-    /* Upload gomb stílusa */
-    .upload-btn
-    {
-      position: relative;
-      padding: 10px 24px;
-      font-size: 16px;
-      background-color: #1E1E1E;
-      color: #FFFFFF;
-      border: 1px solid #444;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s, border-color 0.3s;
-    }
-
-    .upload-btn:hover
-    {
-      background-color: #333333;
-      border-color: #666666;
-    }
-
-    /* Tooltip stílus */
-    .upload-btn .tooltip
-    {
-      visibility: hidden;
-      width: 240px;
-      background-color: #222;
-      color: #fff;
-      text-align: left;
-      border-radius: 6px;
-      padding: 10px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;           /* gomb fölött jelenjen meg */
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 13px;
-      border: 1px solid #555;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-
-    .upload-btn .tooltip::after
-    {
-      content: "";
-      position: absolute;
-      top: 100%;               /* kis nyíl lefelé */
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #222 transparent transparent transparent;
-    }
-
-    .upload-btn:hover .tooltip
-    {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    /* Rejtett fájl input */
-    input[type=file]
-    {
-      display: none;
-    }
-
-    footer
-    {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #AAAAAA;
-    }
-  </style>
+	
+	/*label, select, input { display:block; width:100%; margin:8px 0; }*/
+    select
+	{
+		position: relative;
+		min-height: 40px;
+		min-width: 250px;
+		background: #1E1E1E;
+		color: #fff;
+		border: 1px solid #444;
+		border-radius:8px;
+		padding:8px;
+	}
+    input
+	{
+		min-height: 22px;
+		min-width: 230px;
+		position: relative;
+		padding:8px;
+		border-radius:8px;
+		border:1px solid #444;
+		background:#111;
+		color:#fff;
+	}
+    button
+	{
+		position: relative;
+		background-color: #1E1E1E;
+		color: #FFFFFF;
+		border: 1px solid #444;
+        border-radius: 8px;
+		padding: 10px 24px;
+		font-size: 16px;
+		margin-top:8px;
+		min-width: 200px;
+		cursor: pointer;
+        transition: background-color 0.3s, border-color 0.3s;
+	}
+	  
+      
+      
+      
+      
+      
+      
+	  
+	  
+	  
+	  small { color:#aaa; }
+    #msg { margin-top:8px; color:#9f9; word-break:break-all; white-space:pre-wrap; }
+    #raw { margin-top:8px; color:#f99; font-size:12px; word-break:break-all; white-space:pre-wrap; }
+	
+	  footer
+	  {
+		margin-top: 40px;
+		font-size: 12px;
+		color: #AAAAAA;
+	  }
+	</style>
 </head>
 <body>
-
   <img src="Logo.bmp" alt="No image yet">
+  <h2>WiFi Setup</h2>
+  <p>Choose your own wifi network.</p>
+  <br><br>
+  <label for="ssid">Available networks</label><br><br>
+  <select id="ssid"><option>Scanning...</option></select><br><br>
 
-  <form id="uploadForm" method="POST" action="/upload" enctype="multipart/form-data">
-    <input type="file" id="fileInput" name="upload" accept=".bmp">
-    <button type="button" class="upload-btn" onclick="selectFile()">
-      Upload
-      <span class="tooltip">
-        Only <strong>.BMP</strong> files are supported.<br>
-        Recommended resolution: <strong>64x64 pixels</strong>.<br>
-        The upload starts automatically after selection.
-      </span>
-    </button>
-    <br><br>
-    Only 64x64 *.BMP files are supported.
-  </form>
-<br><br><br>
-  <form action="/sleep" method="GET">
-    <input type="submit" value="Wifi off" class="upload-btn">
-    <br><br>
-	  (Turn off the WiFi of your Anima Nails to save battery)
-    <br><br><br><br><br>
-  </form>
+  <label for="pwd">Password</label><br><br>
+  <input id="pwd" type="password" placeholder="WiFi password"><br><br><br><br>
 
-  <footer>
+  <button id="rescan">Rescan</button>
+	<br>
+  <button id="save">Save & Reboot</button><br>
+  <button id="clear">Clear saved networks</button><br>
+
+  <p id="msg"></p>
+  <pre id="raw"></pre>
+  <br><br><br><br>
+	<footer>
     Anima Nails - 2026
   </footer>
-
-  <script>
-    function selectFile()
+  
+	<script>
+  // Feltöltjük a select-et a kapott listából
+  function populateSelectFromList(list)
+  {
+    const sel = document.getElementById('ssid');
+    sel.innerHTML = '';
+    if (!list || list.length === 0)
     {
-      const fileInput = document.getElementById('fileInput');
-      fileInput.click();
-
-      fileInput.onchange = function()
-      {
-        if (fileInput.files.length > 0)
-        {
-          document.getElementById('uploadForm').submit();
-        }
-      };
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.text = 'No networks found';
+      sel.appendChild(opt);
+      document.getElementById('msg').innerText = 'No networks found';
+      return;
     }
+    list.forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = item.ssid;
+      opt.text = item.ssid + ' (' + item.rssi + ' dBm)' + (item.secure? ' [secure]':' [open]');
+      sel.appendChild(opt);
+    });
+    document.getElementById('msg').innerText = 'Loaded cached scan: ' + list.length + ' networks';
+  }
+
+  function loadCachedNetworks()
+  {
+    document.getElementById('msg').innerText = 'Loading cached list...';
+    fetch(location.origin + '/lastscan', { cache: 'no-store' })
+      .then(function(resp) { return resp.text(); })
+      .then(function(text) {
+        document.getElementById('raw').innerText = text;
+        try {
+          var list = JSON.parse(text);
+        } catch (e) {
+          console.error('Invalid JSON from /lastscan:', e);
+          document.getElementById('msg').innerText = 'No cached data';
+          return;
+        }
+        populateSelectFromList(list);
+      })
+      .catch(function(e) {
+        console.error('Failed to fetch /lastscan:', e);
+        document.getElementById('msg').innerText = 'Failed to load cached list';
+      });
+  }
+
+  function doScanWithWarning()
+  {
+    if (!confirm('Scan will stop and restart the access point briefly. Your phone will disconnect and you will need to reconnect to the AP. Proceed?'))
+    {
+      return;
+    }
+
+    document.getElementById('msg').innerText = 'Starting scan... (you will be disconnected briefly)';
+    document.getElementById('raw').innerText = '';
+    document.getElementById('ssid').innerHTML = '<option>Scanning...</option>';
+
+    const url = location.origin + '/scan';
+    fetch(url, { cache: 'no-store' })
+      .then(function(resp) { return resp.text(); })
+      .then(function(text) {
+        document.getElementById('raw').innerText = text;
+        try {
+          var list = JSON.parse(text);
+          populateSelectFromList(list);
+        } catch (e) {
+          console.warn('Scan returned invalid JSON (or disconnected):', e);
+        }
+        waitForAPAndReload();
+      })
+      .catch(function(e) {
+        console.error('scan request failed (probably disconnected):', e);
+        document.getElementById('msg').innerText = 'Scan started — waiting for device to restore AP...';
+        waitForAPAndReload();
+      });
+  }
+
+  function waitForAPAndReload()
+  {
+    const pingUrl = location.origin + '/ping';
+    document.getElementById('msg').innerText = 'Waiting for device to restore AP...';
+    document.getElementById('raw').innerText = 'Waiting for AP...';
+    const interval = setInterval(function()
+    {
+      fetch(pingUrl, { cache: 'no-store' })
+        .then(function(r) {
+          if (r.status === 200)
+          {
+            clearInterval(interval);
+            setTimeout(function() { loadCachedNetworks(); }, 800);
+          }
+        })
+        .catch(function() {
+          // maradunk várakozóban
+        });
+    }, 1000);
+  }
+
+  // Események
+  document.getElementById('rescan').onclick = function() { doScanWithWarning(); };
+
+  // --- SAVE handler: POST form adatokkal a /save végpontnak ---
+  document.getElementById('save').onclick = function()
+  {
+    const ssid = document.getElementById('ssid').value;
+    const pwd = document.getElementById('pwd').value;
+    if (!ssid)
+    {
+      document.getElementById('msg').innerText = 'Please choose an SSID.';
+      return;
+    }
+    var form = new FormData();
+    form.append('ssid', ssid);
+    form.append('password', pwd);
+    document.getElementById('msg').innerText = 'Saving credentials...';
+    fetch(location.origin + '/save', { method: 'POST', body: form })
+      .then(function(r) { return r.text(); })
+      .then(function(t) {
+        document.getElementById('raw').innerText = t;
+        document.getElementById('msg').innerText = 'Saved. Device will reboot.';
+      })
+      .catch(function(e) {
+        console.error('Save failed:', e);
+        document.getElementById('msg').innerText = 'Save failed: ' + e;
+      });
+  };
+
+  // Clear saved networks: POST /clear (törli a /wifi.txt fájlt és újraindít)
+  document.getElementById('clear').onclick = function()
+  {
+    if (!confirm('Really clear all saved networks? This will remove saved SSID/password and reboot the device.'))
+    {
+      return;
+    }
+
+    document.getElementById('msg').innerText = 'Clearing saved networks and rebooting...';
+    fetch(location.origin + '/clear', { method: 'POST' })
+      .then(function(resp) { return resp.text(); })
+      .then(function(text) { document.getElementById('raw').innerText = text; })
+      .catch(function(e) {
+        console.error('Clear request failed:', e);
+        document.getElementById('msg').innerText = 'Clear request failed: ' + e;
+      });
+  };
+
+  window.addEventListener('load', function() { setTimeout(loadCachedNetworks, 300); });
   </script>
 
 </body>
